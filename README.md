@@ -4,6 +4,7 @@
 
 自分の **GitHubユーザー名** と **Personal Access Token (PAT)** を入力するだけで、プライベートな活動も含めたあなたの全てのコントリビューションが、花の成長にリアルタイムで反映されます。
 
+![代替テキスト]([https://imshota1009.github.io/my-contribution-flower/])
 ---
 
 ## ✨ 機能
