@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>草で育つ花 (PAT対応版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0d1117; color: #c9d1d9; }
+        .github-green-1 { background-color: #0e4429; }
+        .github-green-2 { background-color: #006d32; }
+        .github-green-3 { background-color: #26a641; }
+        .github-green-4 { background-color: #39d353; }
+        .github-bg { background-color: #161b22; }
+        .btn { transition: all 0.2s ease-in-out; }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+        .btn:disabled { cursor: not-allowed; opacity: 0.5; }
+        #messageBox { transition: opacity 0.3s, transform 0.3s; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-5xl mx-auto bg-[#161b22] rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-700 relative">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-green-400">草で育つ花</h1>
+            <p class="text-gray-400 mt-2">あなたの活動が、一輪の花を咲かせます。</p>
+        </header>
+
+        <div id="messageBox" class="hidden absolute top-5 right-5 bg-red-800 border border-red-600 text-white px-4 py-3 rounded-lg shadow-lg opacity-0 transform translate-y-2">
+            <strong id="messageTitle" class="font-bold">エラー!</strong>
+            <span id="messageText" class="block sm:inline"></span>
+        </div>
+
+        <!-- Token Input Section -->
+        <div class="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+            <label for="tokenInput" class="block text-sm font-medium text-gray-300 mb-2">GitHub Personal Access Token (PAT)</label>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <input type="password" id="tokenInput" placeholder="ghp_..." class="flex-grow bg-gray-900 border border-gray-600 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <button id="saveTokenBtn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">トークンを保存</button>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">
+                `read:user`権限を持つトークンが必要です。トークンはあなたのブラウザにのみ保存されます。
+                <a href="https://github.com/settings/tokens/new?scopes=read:user&description=FlowerApp" target="_blank" class="text-blue-400 hover:underline">新しいトークンを作成</a>
+            </p>
+        </div>
+
+        <div class="mb-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <input type="text" id="usernameInput" placeholder="GitHub Username" class="w-full sm:w-64 bg-gray-900 border border-gray-600 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            <button id="generateBtn" class="btn w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg flex items-center justify-center">
+                <span id="btnText">花を育てる</span>
+                <svg id="btnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-gray-900/50 p-4 rounded-lg flex flex-col items-center justify-center min-h-[300px] lg:min-h-[400px]">
+                 <canvas id="flowerCanvas"></canvas>
+            </div>
+            <div class="lg:col-span-1 bg-gray-900/50 p-4 rounded-lg">
+                <h2 class="text-lg font-semibold text-center mb-2">年間コントリビューション</h2>
+                <div id="contributionInfo" class="text-center mb-4">
+                    <span id="totalContributions" class="text-2xl font-bold text-green-400">0</span> contributions
+                </div>
+                <div id="graphContainer" class="w-full h-32 md:h-40 bg-[#0d1117] p-2 rounded-md grid" style="grid-template-columns: repeat(52, 1fr); grid-template-rows: repeat(7, 1fr); gap: 2px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const tokenInput = document.getElementById('tokenInput');
+        const saveTokenBtn = document.getElementById('saveTokenBtn');
+        const usernameInput = document.getElementById('usernameInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const totalContributionsEl = document.getElementById('totalContributions');
+        const graphContainer = document.getElementById('graphContainer');
+        const flowerCanvas = document.getElementById('flowerCanvas');
+        const flowerCtx = flowerCanvas.getContext('2d');
+        const messageBox = document.getElementById('messageBox');
+        const messageTitle = document.getElementById('messageTitle');
+        const messageText = document.getElementById('messageText');
+
+        let animationFrameId;
+        let currentGrowth = 0;
+        let targetGrowth = 0;
+
+        // --- Utility Functions ---
+        function showMessage(title, text, isError = true) {
+            messageTitle.textContent = title;
+            messageText.textContent = text;
+            messageBox.className = `fixed top-5 right-5 text-white px-4 py-3 rounded-lg shadow-lg opacity-0 transform translate-y-2 z-50 ${isError ? 'bg-red-800 border border-red-600' : 'bg-green-800 border border-green-600'}`;
+            messageBox.classList.remove('hidden', 'opacity-0', 'translate-y-2');
+            setTimeout(() => { messageBox.classList.add('opacity-100', 'translate-y-0'); }, 10);
+            setTimeout(() => {
+                messageBox.classList.remove('opacity-100', 'translate-y-0');
+                messageBox.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => messageBox.classList.add('hidden'), 300);
+            }, 5000);
+        }
+
+        // --- Token Management ---
+        saveTokenBtn.addEventListener('click', () => {
+            const token = tokenInput.value;
+            if (token && token.startsWith('ghp_')) {
+                localStorage.setItem('github_pat', token);
+                showMessage('成功', 'トークンをブラウザに保存しました。', false);
+                checkTokenStatus();
+            } else {
+                showMessage('エラー', '無効なトークン形式です。ghp_から始まる必要があります。');
+            }
+        });
+
+        function loadToken() {
+            const token = localStorage.getItem('github_pat');
+            if (token) {
+                tokenInput.value = token;
+            }
+            checkTokenStatus();
+        }
+
+        function checkTokenStatus() {
+             const token = localStorage.getItem('github_pat');
+             generateBtn.disabled = !token;
+             if (!token) {
+                 usernameInput.placeholder = "先にトークンを保存してください";
+                 usernameInput.disabled = true;
+             } else {
+                 usernameInput.placeholder = "GitHub Username";
+                 usernameInput.disabled = false;
+             }
+        }
+
+
+        // --- GitHub API Call ---
+        async function fetchContributionData(username, token) {
+            const GITHUB_GRAPHQL_API = 'https://api.github.com/graphql';
+            const query = `
+                query($username: String!) {
+                    user(login: $username) {
+                        contributionsCollection {
+                            contributionCalendar {
+                                totalContributions
+                                weeks {
+                                    contributionDays {
+                                        contributionCount
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            `;
+
+            try {
+                const response = await fetch(GITHUB_GRAPHQL_API, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query,
+                        variables: { username }
+                    }),
+                });
+
+                const json = await response.json();
+
+                if (json.errors) {
+                    throw new Error(json.errors.map(e => e.message).join('\n'));
+                }
+                if (!json.data.user) {
+                     throw new Error("GitHub user not found.");
+                }
+
+                const calendar = json.data.user.contributionsCollection.contributionCalendar;
+                const total = calendar.totalContributions;
+                const data = calendar.weeks.flatMap(week => week.contributionDays.map(day => day.contributionCount));
+
+                return { data, total };
+
+            } catch (error) {
+                console.error("Failed to fetch contribution data:", error);
+                let errorMessage = "データの取得に失敗しました。";
+                if (error.message.includes("401")) {
+                    errorMessage = "認証に失敗しました。PATが正しいか確認してください。";
+                } else if (error.message.includes("user not found")) {
+                    errorMessage = "ユーザーが見つかりませんでした。";
+                }
+                showMessage('APIエラー', errorMessage);
+                return null;
+            }
+        }
+        
+        // --- Drawing and Animation ---
+        function drawContributionGraph(data) {
+            graphContainer.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            data.forEach(count => {
+                const cell = document.createElement('div');
+                cell.className = 'w-full h-full rounded-sm';
+                let colorClass = 'github-bg';
+                if (count > 0 && count <= 4) colorClass = 'github-green-1';
+                else if (count > 4 && count <= 8) colorClass = 'github-green-2';
+                else if (count > 8 && count <= 12) colorClass = 'github-green-3';
+                else if (count > 12) colorClass = 'github-green-4';
+                cell.classList.add(colorClass);
+                cell.title = `${count} contributions`;
+                fragment.appendChild(cell);
+            });
+            graphContainer.appendChild(fragment);
+        }
+
+        function setupFlowerCanvas() {
+            const container = flowerCanvas.parentElement;
+            const size = Math.min(container.clientWidth, container.clientHeight, 400) * 0.95;
+            const dpr = window.devicePixelRatio || 1;
+            flowerCanvas.width = size * dpr;
+            flowerCanvas.height = size * dpr;
+            flowerCanvas.style.width = `${size}px`;
+            flowerCanvas.style.height = `${size}px`;
+            flowerCtx.scale(dpr, dpr);
+        }
+        
+        function drawFlower(growth) {
+            const W = flowerCanvas.width / (window.devicePixelRatio || 1);
+            const H = flowerCanvas.height / (window.devicePixelRatio || 1);
+            flowerCtx.clearRect(0, 0, W, H);
+            flowerCtx.fillStyle = '#6b462a'; flowerCtx.strokeStyle = '#4a2f1e'; flowerCtx.lineWidth = 4;
+            flowerCtx.beginPath(); flowerCtx.moveTo(W * 0.35, H * 0.95); flowerCtx.lineTo(W * 0.65, H * 0.95); flowerCtx.lineTo(W * 0.7, H * 0.8); flowerCtx.lineTo(W * 0.3, H * 0.8); flowerCtx.closePath(); flowerCtx.fill(); flowerCtx.stroke();
+            flowerCtx.fillStyle = '#966F33'; flowerCtx.fillRect(W * 0.28, H * 0.8 - 5, W * 0.44, 10);
+            if (growth <= 0) return;
+            const stemHeight = H * 0.6 * Math.min(1, growth * 5); const stemTopY = H * 0.8 - stemHeight;
+            flowerCtx.strokeStyle = '#006d32'; flowerCtx.lineWidth = 8;
+            flowerCtx.beginPath(); flowerCtx.moveTo(W / 2, H * 0.8); flowerCtx.lineTo(W / 2, stemTopY); flowerCtx.stroke();
+            if (growth > 0.1) {
+                const leafGrowth = (growth - 0.1) / 0.3;
+                if (leafGrowth > 0){
+                    flowerCtx.fillStyle = '#26a641';
+                    flowerCtx.beginPath(); flowerCtx.moveTo(W / 2 - 4, H * 0.6); flowerCtx.quadraticCurveTo(W/2 - 40 * leafGrowth, H*0.65, W/2-4, H*0.7); flowerCtx.quadraticCurveTo(W/2, H*0.68, W/2-4, H*0.6); flowerCtx.fill();
+                    flowerCtx.beginPath(); flowerCtx.moveTo(W / 2 + 4, H * 0.65); flowerCtx.quadraticCurveTo(W/2 + 40 * leafGrowth, H*0.7, W/2+4, H*0.75); flowerCtx.quadraticCurveTo(W/2, H*0.73, W/2+4, H*0.65); flowerCtx.fill();
+                }
+            }
+            if (growth > 0.3) {
+                 const flowerGrowth = (growth - 0.3) / 0.7; const centerX = W / 2; const centerY = stemTopY;
+                 const centerRadius = 15 * Math.min(1, flowerGrowth * 2);
+                 flowerCtx.fillStyle = '#ffdd00'; flowerCtx.beginPath(); flowerCtx.arc(centerX, centerY, centerRadius, 0, Math.PI * 2); flowerCtx.fill();
+                 const numPetals = 8; const petalLength = 40 * flowerGrowth; const petalWidth = 20 * flowerGrowth;
+                 if (petalLength > 0){
+                    flowerCtx.fillStyle = '#ff8fab';
+                    for (let i = 0; i < numPetals; i++) {
+                         const angle = (i / numPetals) * Math.PI * 2;
+                         flowerCtx.save(); flowerCtx.translate(centerX, centerY); flowerCtx.rotate(angle);
+                         flowerCtx.beginPath(); flowerCtx.ellipse(petalLength / 1.5, 0, petalLength, petalWidth, 0, 0, Math.PI * 2); flowerCtx.fill();
+                         flowerCtx.restore();
+                    }
+                 }
+            }
+        }
+        
+        function animateFlower() {
+            const ease = 0.05;
+            const diff = targetGrowth - currentGrowth;
+            if (Math.abs(diff) < 0.001) { currentGrowth = targetGrowth; drawFlower(currentGrowth); animationFrameId = null; } 
+            else { currentGrowth += diff * ease; drawFlower(currentGrowth); animationFrameId = requestAnimationFrame(animateFlower); }
+        }
+        
+        // --- Main Handler ---
+        async function handleGenerateClick() {
+            const username = usernameInput.value.trim();
+            const token = localStorage.getItem('github_pat');
+            if (!username) { showMessage('エラー', 'ユーザー名を入力してください。'); return; }
+            if (!token) { showMessage('エラー', 'GitHub PATを先に保存してください。'); return; }
+
+            generateBtn.disabled = true; btnText.classList.add('hidden'); btnSpinner.classList.remove('hidden');
+            const result = await fetchContributionData(username, token);
+            generateBtn.disabled = false; btnText.classList.remove('hidden'); btnSpinner.classList.add('hidden');
+
+            if (result) {
+                const { data, total } = result;
+                totalContributionsEl.textContent = total.toLocaleString();
+                drawContributionGraph(data);
+                const maxContributionsForFullBloom = 4000;
+                targetGrowth = Math.min(1, total / maxContributionsForFullBloom);
+                if (!animationFrameId) animateFlower();
+            } else {
+                totalContributionsEl.textContent = '0';
+                drawContributionGraph(Array(52 * 7).fill(0));
+                targetGrowth = 0;
+                if (!animationFrameId) animateFlower();
+            }
+        }
+
+        // --- Initial Load ---
+        generateBtn.addEventListener('click', handleGenerateClick);
+        usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleGenerateClick(); });
+        window.addEventListener('resize', () => { setupFlowerCanvas(); drawFlower(currentGrowth); });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadToken();
+            setupFlowerCanvas();
+            drawFlower(0);
+            drawContributionGraph(Array(52 * 7).fill(0));
+        });
+    </script>
+</body>
+</html>
