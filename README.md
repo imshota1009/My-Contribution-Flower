@@ -1,65 +1,89 @@
 # 草で育つ花 🌸 (Contribution Flower)
 
-あなたのGitHubでの日々の頑張り（草）を、美しい花を育てる力に変えるWebアプリケーションです。  
+<div align="center">
 
-自分の **GitHubユーザー名** と **Personal Access Token (PAT)** を入力するだけで、プライベートな活動も含めたあなたの全てのコントリビューションが、花の成長にリアルタイムで反映されます。
+あなたのGitHubでの日々の頑張り（草）を、  
+美しい花を育てる力に変えるWebアプリケーションです。  
 
-ここから自分の花の成長を確認できます⇒https://imshota1009.github.io/my-contribution-flower/
+</div>
 
-## スクリーンショット
+<p align="center">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
+  <img src="https://img.shields.io/badge/GitHub_API-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub API">
+</p>
+
+---
+
+## 🌼 アプリについて (About)
+
+自分の **GitHubユーザー名** と **Personal Access Token (PAT)** を入力するだけで、  
+プライベートを含む全てのコントリビューションがリアルタイムで花の成長に反映されます。  
+
+👉 [ここから自分の花の成長を確認できます](https://imshota1009.github.io/my-contribution-flower/)
+
+---
+
+## 📸 スクリーンショット
+
 ![アプリのスクリーンショット](./images/myflower_screenshot.png)
 
 ---
 
-## ✨ 機能
+## ✨ 機能 (Features)
 
 - **正確なデータ反映**  
-  GitHub GraphQL APIを利用し、あなたの公開・非公開のコントリビューション数を正確に取得します。
+  GitHub GraphQL APIを利用し、公開・非公開のコントリビューションを正確に取得。  
 
 - **成長の可視化**  
-  コントリビューション数に応じて、種から芽吹き、葉をつけ、やがて満開の花を咲かせるまで、成長の過程をアニメーションで楽しめます。
+  草（Contribution）に応じて、種 → 芽吹き → 葉 → 満開の花へと変化。アニメーションで成長を楽しめます。  
 
 - **安全な設計**  
-  入力されたPATは、ブラウザの`localStorage`にのみ保存され、外部のサーバーに送信されることは一切ありません。
+  入力されたPATはブラウザの `localStorage` のみに保存され、外部サーバーには送信されません。  
 
 ---
 
-## 🚀 使い方
+## 🚀 使い方 (How To Use)
 
-このアプリケーションを利用するには、GitHubからコントリビューション情報を読み取るための **Personal Access Token (PAT)** が必要です。
+このアプリを利用するには、**GitHub Personal Access Token (PAT)** が必要です。  
 
-### 1. Personal Access Token (PAT) の準備
+### 1. PATの作成方法
 
-1. [こちらのリンク](https://github.com/settings/tokens/new) をクリックして、GitHubの新しいPAT作成ページを開きます。  
-2. **Note (名前)** は `Contribution Flower Viewer` など、分かりやすい名前をおすすめします。  
-3. **Expiration (有効期限)** を選択します。（セキュリティのため *90 days* などを推奨）  
-4. **Scopes (権限)** は、`read:user` のみチェックを入れてください。（それ以外は不要）  
-5. ページ一番下の **[Generate token]** をクリックします。  
-6. `ghp_`から始まるトークンが表示されます。このトークンは一度しか表示されないので、必ずコピーして安全な場所に保管してください。  
+1. [こちら](https://github.com/settings/tokens/new) から新しいPAT作成ページを開く  
+2. **Note**: `Contribution Flower Viewer` など分かりやすい名前  
+3. **Expiration**: セキュリティのため *90 days* 推奨  
+4. **Scopes**: `read:user` のみチェック  
+5. ページ下部の **Generate token** をクリック  
+6. `ghp_` から始まるトークンをコピー（1回しか表示されません！）  
 
 ---
 
 ### 2. 花を育てる
 
-1. アプリケーションのページを開きます。  
-2. 入力欄に **GitHubユーザー名** を入力します。  
-3. もう一方の入力欄に、先ほど取得した **Personal Access Token (PAT)** を貼り付けます。  
-4. **「花を育てる」** ボタンをクリックします。  
-5. あなたの頑張りに応じた花が、画面上に美しく咲き誇ります！  
+1. アプリを開く  
+2. **GitHubユーザー名** を入力  
+3. **PAT** を入力  
+4. **「花を育てる」** ボタンをクリック  
+5. あなたの草が、美しい花として画面に咲き誇ります 🌸  
 
 ---
 
-## ⚠️ セキュリティに関する注意事項
+## ⚠️ セキュリティについて
 
-- PATはパスワードと同様に重要です。 **他人と共有したり、公開リポジトリにコミットしたりしないでください。**  
-- 本アプリは入力されたPATを **ブラウザのlocalStorageにのみ保存** し、外部への送信は一切行いません。  
-- 安心してご利用いただけますが、公共のコンピュータでの使用は避けることをおすすめします。  
+- PATはパスワードと同じくらい重要です。  
+  **他人と共有・公開リポジトリにコミットしないでください。**  
+- 本アプリはPATを **ブラウザのlocalStorageのみに保存** し、外部送信は一切行いません。  
+- 公共のPCでの利用は避けてください。  
 
 ---
 
-## 🛠️ 使用技術
+## 🛠️ 使用技術 (Technologies Used)
 
-- HTML  
-- Tailwind CSS  
-- JavaScript  
-- GitHub GraphQL API v4  
+- **HTML5**: 基本構造  
+- **Tailwind CSS**: スタイリング  
+- **JavaScript (ES6+)**: アプリロジック  
+- **GitHub GraphQL API v4**: コントリビューションデータ取得  
+
+---
+
