@@ -27,7 +27,7 @@ and watch all of your contributions (including private ones) turn into a growing
 
 ## 📸 Screenshot
 
-![App Screenshot](./images/myflower_screenshot.png)
+![App Screenshot](./images/myflower_screenshot.jpg)
 
 ---
 
