@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>草で育つ花 (PAT対応版)</title>
+    <title>Flower from Contributions (PAT Version)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -23,12 +23,12 @@
 
     <div class="w-full max-w-5xl mx-auto bg-[#161b22] rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-700 relative">
         <header class="text-center mb-6">
-            <h1 class="text-3xl md:text-4xl font-bold text-green-400">草で育つ花</h1>
-            <p class="text-gray-400 mt-2">あなたの活動が、一輪の花を咲かせます。</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-green-400">Flower from Contributions</h1>
+            <p class="text-gray-400 mt-2">Your activity will grow a beautiful flower.</p>
         </header>
 
         <div id="messageBox" class="hidden absolute top-5 right-5 bg-red-800 border border-red-600 text-white px-4 py-3 rounded-lg shadow-lg opacity-0 transform translate-y-2">
-            <strong id="messageTitle" class="font-bold">エラー!</strong>
+            <strong id="messageTitle" class="font-bold">Error!</strong>
             <span id="messageText" class="block sm:inline"></span>
         </div>
 
@@ -37,18 +37,18 @@
             <label for="tokenInput" class="block text-sm font-medium text-gray-300 mb-2">GitHub Personal Access Token (PAT)</label>
             <div class="flex flex-col sm:flex-row gap-2">
                 <input type="password" id="tokenInput" placeholder="ghp_..." class="flex-grow bg-gray-900 border border-gray-600 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                <button id="saveTokenBtn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">トークンを保存</button>
+                <button id="saveTokenBtn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Save Token</button>
             </div>
             <p class="text-xs text-gray-500 mt-2">
-                `read:user`権限を持つトークンが必要です。トークンはあなたのブラウザにのみ保存されます。
-                <a href="https://github.com/settings/tokens/new?scopes=read:user&description=FlowerApp" target="_blank" class="text-blue-400 hover:underline">新しいトークンを作成</a>
+                A token with `read:user` permissions is required. The token is only saved in your browser.
+                <a href="https://github.com/settings/tokens/new?scopes=read:user&description=FlowerApp" target="_blank" class="text-blue-400 hover:underline">Create a new token</a>
             </p>
         </div>
 
         <div class="mb-6 flex flex-col sm:flex-row items-center justify-center gap-3">
             <input type="text" id="usernameInput" placeholder="GitHub Username" class="w-full sm:w-64 bg-gray-900 border border-gray-600 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
             <button id="generateBtn" class="btn w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg flex items-center justify-center">
-                <span id="btnText">花を育てる</span>
+                <span id="btnText">Grow Flower</span>
                 <svg id="btnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -61,7 +61,7 @@
                  <canvas id="flowerCanvas"></canvas>
             </div>
             <div class="lg:col-span-1 bg-gray-900/50 p-4 rounded-lg">
-                <h2 class="text-lg font-semibold text-center mb-2">年間コントリビューション</h2>
+                <h2 class="text-lg font-semibold text-center mb-2">Annual Contributions</h2>
                 <div id="contributionInfo" class="text-center mb-4">
                     <span id="totalContributions" class="text-2xl font-bold text-green-400">0</span> contributions
                 </div>
@@ -109,10 +109,10 @@
             const token = tokenInput.value;
             if (token && token.startsWith('ghp_')) {
                 localStorage.setItem('github_pat', token);
-                showMessage('成功', 'トークンをブラウザに保存しました。', false);
+                showMessage('Success', 'Token saved to your browser.', false);
                 checkTokenStatus();
             } else {
-                showMessage('エラー', '無効なトークン形式です。ghp_から始まる必要があります。');
+                showMessage('Error', 'Invalid token format. It must start with ghp_.');
             }
         });
 
@@ -128,7 +128,7 @@
              const token = localStorage.getItem('github_pat');
              generateBtn.disabled = !token;
              if (!token) {
-                 usernameInput.placeholder = "先にトークンを保存してください";
+                 usernameInput.placeholder = "Please save a token first";
                  usernameInput.disabled = true;
              } else {
                  usernameInput.placeholder = "GitHub Username";
@@ -187,13 +187,13 @@
 
             } catch (error) {
                 console.error("Failed to fetch contribution data:", error);
-                let errorMessage = "データの取得に失敗しました。";
+                let errorMessage = "Failed to fetch data.";
                 if (error.message.includes("401")) {
-                    errorMessage = "認証に失敗しました。PATが正しいか確認してください。";
+                    errorMessage = "Authentication failed. Please check if your PAT is correct.";
                 } else if (error.message.includes("user not found")) {
-                    errorMessage = "ユーザーが見つかりませんでした。";
+                    errorMessage = "User not found.";
                 }
-                showMessage('APIエラー', errorMessage);
+                showMessage('API Error', errorMessage);
                 return null;
             }
         }
@@ -248,19 +248,19 @@
                 }
             }
             if (growth > 0.3) {
-                 const flowerGrowth = (growth - 0.3) / 0.7; const centerX = W / 2; const centerY = stemTopY;
-                 const centerRadius = 15 * Math.min(1, flowerGrowth * 2);
-                 flowerCtx.fillStyle = '#ffdd00'; flowerCtx.beginPath(); flowerCtx.arc(centerX, centerY, centerRadius, 0, Math.PI * 2); flowerCtx.fill();
-                 const numPetals = 8; const petalLength = 40 * flowerGrowth; const petalWidth = 20 * flowerGrowth;
-                 if (petalLength > 0){
+                const flowerGrowth = (growth - 0.3) / 0.7; const centerX = W / 2; const centerY = stemTopY;
+                const centerRadius = 15 * Math.min(1, flowerGrowth * 2);
+                flowerCtx.fillStyle = '#ffdd00'; flowerCtx.beginPath(); flowerCtx.arc(centerX, centerY, centerRadius, 0, Math.PI * 2); flowerCtx.fill();
+                const numPetals = 8; const petalLength = 40 * flowerGrowth; const petalWidth = 20 * flowerGrowth;
+                if (petalLength > 0){
                     flowerCtx.fillStyle = '#ff8fab';
                     for (let i = 0; i < numPetals; i++) {
-                         const angle = (i / numPetals) * Math.PI * 2;
-                         flowerCtx.save(); flowerCtx.translate(centerX, centerY); flowerCtx.rotate(angle);
-                         flowerCtx.beginPath(); flowerCtx.ellipse(petalLength / 1.5, 0, petalLength, petalWidth, 0, 0, Math.PI * 2); flowerCtx.fill();
-                         flowerCtx.restore();
+                        const angle = (i / numPetals) * Math.PI * 2;
+                        flowerCtx.save(); flowerCtx.translate(centerX, centerY); flowerCtx.rotate(angle);
+                        flowerCtx.beginPath(); flowerCtx.ellipse(petalLength / 1.5, 0, petalLength, petalWidth, 0, 0, Math.PI * 2); flowerCtx.fill();
+                        flowerCtx.restore();
                     }
-                 }
+                }
             }
         }
         
@@ -275,8 +275,8 @@
         async function handleGenerateClick() {
             const username = usernameInput.value.trim();
             const token = localStorage.getItem('github_pat');
-            if (!username) { showMessage('エラー', 'ユーザー名を入力してください。'); return; }
-            if (!token) { showMessage('エラー', 'GitHub PATを先に保存してください。'); return; }
+            if (!username) { showMessage('Error', 'Please enter a username.'); return; }
+            if (!token) { showMessage('Error', 'Please save your GitHub PAT first.'); return; }
 
             generateBtn.disabled = true; btnText.classList.add('hidden'); btnSpinner.classList.remove('hidden');
             const result = await fetchContributionData(username, token);
@@ -311,3 +311,5 @@
     </script>
 </body>
 </html>
+
+
