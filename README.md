@@ -21,7 +21,6 @@ into the power to grow a beautiful flower 🌱🌼
 Simply enter your **GitHub username** and **Personal Access Token (PAT)**,  
 and watch all of your contributions (including private ones) turn into a growing flower in real time.  
 
-👉 [Check out your flower here](https://imshota1009.github.io/My-Contribution-Flower/)
 
 ---
 
